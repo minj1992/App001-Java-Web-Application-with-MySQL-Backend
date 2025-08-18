@@ -1,0 +1,20 @@
+PS D:\nishant-final-lecture-prep\001-java-coding-learning\002-java-coding\nishant-custom-java-app-using-jsp-master_backup\nishant-custom-java-app-using-jsp-master> javac -cp "C:\Program Files\Apache Software Foundation\Tomcat 10.1\lib\servlet-api.jar;." -d WEB-INF\classes *.java
+PS D:\nishant-final-lecture-prep\001-java-coding-learning\002-java-coding\nishant-custom-java-app-using-jsp-master_backup\nishant-custom-java-app-using-jsp-master> jar -cvf java-test.war *
+added manifest
+adding: index.html(in = 6405) (out= 1499)(deflated 76%)
+adding: LoginServlet.class(in = 2406) (out= 1269)(deflated 47%)
+adding: LoginServlet.java(in = 1687) (out= 679)(deflated 59%)
+adding: logout.jsp(in = 77) (out= 71)(deflated 7%)
+adding: mysql-connector-j-9.1.0.jar(in = 2597591) (out= 2433426)(deflated 6%)
+adding: profile.html(in = 5893) (out= 1855)(deflated 68%)
+adding: profile.jsp(in = 6153) (out= 1980)(deflated 67%)
+adding: RegisterServlet.class(in = 2466) (out= 1311)(deflated 46%)
+adding: RegisterServlet.java(in = 1525) (out= 641)(deflated 57%)
+adding: WEB-INF/(in = 0) (out= 0)(stored 0%)
+adding: WEB-INF/classes/(in = 0) (out= 0)(stored 0%)
+adding: WEB-INF/classes/LoginServlet.class(in = 2023) (out= 1100)(deflated 45%)
+adding: WEB-INF/classes/LoginServlet.java(in = 1687) (out= 679)(deflated 59%)
+adding: WEB-INF/classes/RegisterServlet.class(in = 2466) (out= 1326)(deflated 46%)
+adding: WEB-INF/classes/RegisterServlet.java(in = 1525) (out= 641)(deflated 57%)
+adding: WEB-INF/web.xml(in = 851) (out= 243)(deflated 71%)
+PS D:\nishant-final-lecture-prep\001-java-coding-learning\002-java-coding\nishant-custom-java-app-using-jsp-master_backup\nishant-custom-java-app-using-jsp-master>

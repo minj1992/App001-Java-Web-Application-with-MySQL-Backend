@@ -1,0 +1,240 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    String username = (String) session.getAttribute("username");
+    if (username == null) {
+        response.sendRedirect("index.html");
+        return;
+    }
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS-Style UI</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { background: #232f3e; color: #fff; }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #1f2735; padding: 10px 20px; border-bottom: 1px solid #3d4a56;
+    }
+
+    .brand { color: #ff9900; font-size: 20px; font-weight: bold; }
+
+    .nav-controls {
+      display: flex; align-items: center; gap: 15px; position: relative;
+    }
+
+    .search-container {
+      position: relative;
+    }
+
+    .search-container input[type="text"] {
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: none;
+      width: 200px;
+      background: #3d4a56;
+      color: #fff;
+    }
+
+    .suggestions {
+      position: absolute;
+      top: 35px;
+      background: #2d3e50;
+      width: 100%;
+      border: 1px solid #3d4a56;
+      border-radius: 4px;
+      display: none;
+      z-index: 99;
+    }
+
+    .suggestions div {
+      padding: 8px 10px;
+      cursor: pointer;
+      color: #a4b0be;
+    }
+
+    .suggestions div:hover {
+      background-color: #3d4a56;
+      color: #fff;
+    }
+
+    select {
+      padding: 6px 10px;
+      border-radius: 4px;
+      background: #3d4a56;
+      color: #fff;
+      border: none;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: #a4b0be;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .icon-btn:hover { color: #fff; }
+
+    .profile {
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .profile span { margin-right: 5px; }
+
+    .profile-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: #2d3e50;
+      border: 1px solid #3d4a56;
+      border-radius: 4px;
+      width: 180px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+    }
+
+    .profile-dropdown a {
+      display: block;
+      padding: 10px 15px;
+      color: #a4b0be;
+      text-decoration: none;
+    }
+
+    .profile-dropdown a:hover {
+      background: #3d4a56;
+      color: #fff;
+    }
+
+    .profile-dropdown.active {
+      display: block;
+    }
+
+    /* Favorites Bar */
+    .favorites-bar {
+      background: #2d3e50;
+      padding: 8px 20px;
+      display: flex;
+      gap: 15px;
+      border-bottom: 1px solid #3d4a56;
+    }
+
+    .favorites-bar a {
+      color: #a4b0be;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      background: #3d4a56;
+      transition: background 0.3s;
+    }
+
+    .favorites-bar a:hover {
+      background: #4e5a66;
+      color: #fff;
+    }
+
+    .content {
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <div class="brand">Kubernatest | AI Learning</div>
+    <div class="nav-controls">
+      <div class="search-container">
+        <input type="text" id="search" placeholder="Search AWS Console ..." oninput="showSuggestions()" />
+        <div id="suggestions" class="suggestions"></div>
+      </div>
+      <select>
+        <option>US East (N. Virginia)</option>
+        <option>US West (Oregon)</option>
+        <option>Asia Pacific (Mumbai)</option>
+      </select>
+      <button class="icon-btn" title="CloudShell">🖥️</button>
+      <button class="icon-btn" title="Notifications">🔔</button>
+      <button class="icon-btn" title="Support">❓</button>
+      <button class="icon-btn" title="Settings">⚙️</button>
+      <div class="profile" onclick="toggleProfile()">
+        <span><%= username %></span> ▼
+        <div id="profileMenu" class="profile-dropdown">
+          <a href="#">My Account</a>
+          <a href="#">Settings</a>
+          <a href="logout.jsp">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favorites Bar -->
+  <div class="favorites-bar">
+    <a href="#">EC2</a>
+    <a href="#">S3</a>
+    <a href="#">Lambda</a>
+    <a href="#">CloudWatch</a>
+    <a href="#">IAM</a>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="content">
+    <h2>Welcome, <%= username %></h2>
+    <p>Your AWS-style dashboard continues here.</p>
+  </div>
+
+  <script>
+    // Profile dropdown toggle
+    function toggleProfile() {
+      document.getElementById('profileMenu').classList.toggle('active');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.profile')) {
+        document.getElementById('profileMenu').classList.remove('active');
+      }
+    });
+
+    // Search autocomplete logic
+    const services = ["EC2", "S3", "Lambda", "RDS", "CloudFront", "IAM", "SNS", "SES", "DynamoDB", "CloudWatch"];
+    function showSuggestions() {
+      const input = document.getElementById("search");
+      const dropdown = document.getElementById("suggestions");
+      const value = input.value.toLowerCase();
+      dropdown.innerHTML = "";
+
+      if (value === "") {
+        dropdown.style.display = "none";
+        return;
+      }
+
+      const matches = services.filter(service => service.toLowerCase().includes(value));
+      if (matches.length === 0) {
+        dropdown.style.display = "none";
+        return;
+      }
+
+      matches.forEach(match => {
+        const div = document.createElement("div");
+        div.textContent = match;
+        div.onclick = () => {
+          input.value = match;
+          dropdown.style.display = "none";
+        };
+        dropdown.appendChild(div);
+      });
+      dropdown.style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
