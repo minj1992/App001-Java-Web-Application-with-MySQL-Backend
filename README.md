@@ -339,6 +339,11 @@ java -cp ".:/usr/local/tomcat/lib/mysql-connector-j-9.1.0.jar" TestDB
 
 ---
 
+![Uploading 001-proj-001.png…]()
+
+
+<img width="946" height="388" alt="001-proj-002" src="https://github.com/user-attachments/assets/2e52aca4-6429-418b-a1b2-5455c74efdb3" />
+
 This README covers **Windows & Linux compilation**, **WAR generation**, **Docker build & push**, **Kubernetes deployment**, **storage explanation**, and **frontend-backend flow diagram**.
 
 ---
