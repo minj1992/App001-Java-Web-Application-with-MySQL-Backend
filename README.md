@@ -348,7 +348,3 @@ java -cp ".:/usr/local/tomcat/lib/mysql-connector-j-9.1.0.jar" TestDB
 This README covers **Windows & Linux compilation**, **WAR generation**, **Docker build & push**, **Kubernetes deployment**, **storage explanation**, and **frontend-backend flow diagram**.
 
 ---
-
-If you want, I can also provide a **ready-to-run automation script** that compiles, generates WAR, builds Docker, tags, and pushes in one shot for both Windows & Linux.
-
-Do you want me to create that script as well?
