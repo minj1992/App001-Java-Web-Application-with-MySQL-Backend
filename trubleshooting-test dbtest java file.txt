@@ -1,8 +1,6 @@
-https://chatgpt.com/share/68a86f80-81c0-8011-88d5-312f399e71b6
 
-https://chatgpt.com/share/68a86f80-81c0-8011-88d5-312f399e71b6
 
-Here’s the correct TestDB.java:
+ correct TestDB.java:
 
 import java.sql.Connection;
 import java.sql.DriverManager;
