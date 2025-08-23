@@ -1,0 +1,178 @@
+# ===============================
+# StorageClass for dynamic EBS
+# ===============================
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ebs-sc-dynamic
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp3
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+
+---
+# ===============================
+# PersistentVolumeClaim for MySQL
+# ===============================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc-dynamic
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# ===============================
+# Cleanup Job for MySQL PVC
+# ===============================
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cleanup-mysql-data
+spec:
+  template:
+    spec:
+      containers:
+      - name: cleanup
+        image: busybox
+        command:
+          - sh
+          - -c
+          - |
+            echo "Cleaning MySQL data..."
+            rm -rf /var/lib/mysql/*
+            mkdir -p /var/lib/mysql
+            echo "Done."
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+      restartPolicy: Never
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+  backoffLimit: 0
+
+---
+# ===============================
+# MySQL Deployment (with dynamic PVC)
+# ===============================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  labels:
+    app: mysql
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+        tier: backend
+    spec:
+      containers:
+        - name: mysql
+          image: 180294213274.dkr.ecr.us-east-1.amazonaws.com/app001-dev:backend1.1.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "Login%12345"
+            - name: MYSQL_DATABASE
+              value: "db1"
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+
+---
+# ===============================
+# MySQL Service
+# ===============================
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service1
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP
+
+---
+# ===============================
+# Frontend Deployment
+# ===============================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: java-frontend
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-frontend
+  template:
+    metadata:
+      labels:
+        app: java-frontend
+        tier: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: 180294213274.dkr.ecr.us-east-1.amazonaws.com/app001-dev:frontend1.1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: "mysql-service1"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: "db1"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              value: "Login%12345"
+
+---
+# ===============================
+# Frontend NodePort Service
+# ===============================
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-nodeport
+spec:
+  selector:
+    app: java-frontend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30080
+  type: NodePort
